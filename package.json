@@ -89,7 +89,7 @@
     "Lachlan Newman <lachnewman007@gmail.com>"
   ],
   "scripts": {
-    "install": "node install/libvips",
+    "install": "node install/libvips && prebuild-install || node-gyp rebuild --release",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run test-lint && npm run test-unit && npm run test-licensing && npm run test-types",
     "test-lint": "semistandard && cpplint",
@@ -135,6 +135,7 @@
     "color": "^4.2.3",
     "detect-libc": "^2.0.2",
     "node-addon-api": "^6.1.0",
+    "prebuild-install": "^7.1.1",
     "semver": "^7.5.4",
     "simple-get": "^4.0.1",
     "tar-fs": "^3.0.4",
