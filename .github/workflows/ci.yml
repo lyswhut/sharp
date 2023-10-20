@@ -27,5 +27,5 @@ jobs:
       # - name: Test
       #   run: npm test
       - name: Prebuild
-        run: npx prebuild --runtime electron --target 25.0.0 && ls build/Release
+        run: npx prebuild --runtime electron --target 25.0.0 --include-regex 'sharp\.node$' && ls build/Release
 
