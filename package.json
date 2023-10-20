@@ -89,7 +89,7 @@
     "Lachlan Newman <lachnewman007@gmail.com>"
   ],
   "scripts": {
-    "install": "(node install/libvips && node install/dll-copy) || (node install/can-compile && node-gyp rebuild && node install/dll-copy)",
+    "install": "node install/libvips",
     "clean": "rm -rf node_modules/ build/ vendor/ .nyc_output/ coverage/ test/fixtures/output.*",
     "test": "npm run test-lint && npm run test-unit && npm run test-licensing && npm run test-types",
     "test-lint": "semistandard && cpplint",

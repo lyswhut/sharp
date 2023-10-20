@@ -5,6 +5,37 @@
     'sharp_vendor_dir': './vendor/<(vips_version)/<(platform_and_arch)'
   },
   'targets': [{
+    'target_name': 'copy-lib',
+    'type': 'none',
+    'conditions': [
+      ['OS == "win"', {
+        'copies': [{
+          'destination': 'build/Release',
+          'files': [
+            '<(sharp_vendor_dir)/lib/libvips-42.dll',
+            '<(sharp_vendor_dir)/lib/libglib-2.0-0.dll',
+            '<(sharp_vendor_dir)/lib/libgobject-2.0-0.dll'
+          ]
+        }]
+      }],
+      ['OS == "mac"', {
+        'copies': [{
+          'destination': 'build/Release',
+          'files': [
+            '<(sharp_vendor_dir)/lib/libvips-cpp.42.dylib'
+          ]
+        }]
+      }],
+      ['OS == "linux"', {
+        'copies': [{
+          'destination': 'build/Release',
+          'files': [
+            '<(sharp_vendor_dir)/lib/libvips-cpp.so.42'
+          ]
+        }]
+      }]
+    ]
+  }, {
     'target_name': 'libvips-cpp',
     'conditions': [
       ['OS == "win"', {
@@ -143,7 +174,7 @@
           }],
           ['OS == "mac"', {
             'link_settings': {
-              'library_dirs': ['../<(sharp_vendor_dir)/lib'],
+              'library_dirs': ['Release'],
               'libraries': [
                 'libvips-cpp.42.dylib'
               ]
@@ -151,7 +182,7 @@
             'xcode_settings': {
               'OTHER_LDFLAGS': [
                 # Ensure runtime linking is relative to sharp.node
-                '-Wl,-rpath,\'@loader_path/../../<(sharp_vendor_dir)/lib\''
+                '-Wl,-rpath,\'@loader_path\''
               ]
             }
           }],
@@ -160,13 +191,13 @@
               '_GLIBCXX_USE_CXX11_ABI=1'
             ],
             'link_settings': {
-              'library_dirs': ['../<(sharp_vendor_dir)/lib'],
+              'library_dirs': ['Release'],
               'libraries': [
                 '-l:libvips-cpp.so.42'
               ],
               'ldflags': [
                 # Ensure runtime linking is relative to sharp.node
-                '-Wl,-s -Wl,--disable-new-dtags -Wl,-rpath=\'$$ORIGIN/../../<(sharp_vendor_dir)/lib\''
+                '-Wl,-s -Wl,--disable-new-dtags -Wl,-rpath=\'$$ORIGIN\''
               ]
             }
           }]

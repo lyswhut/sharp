@@ -3,6 +3,7 @@ on:
   - push
 
 env:
+  SHARP_IGNORE_GLOBAL_LIBVIPS: 1
   ELECTRON_BUILD_CMD: node install/libvips && npx prebuild -r electron -t 25.0.0 --strip --include-regex '(\.so|sharp\.node)$'
 
 jobs:
