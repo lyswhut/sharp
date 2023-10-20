@@ -4,7 +4,10 @@ on:
 
 env:
   SHARP_IGNORE_GLOBAL_LIBVIPS: 1
-  ELECTRON_BUILD_CMD: node install/libvips && npx prebuild -r electron -t 25.0.0 --strip --include-regex '(\.so|sharp\.node)$'
+  ELECTRON_BUILD_CMD: node install/libvips && npx prebuild -r electron -t 25.0.0 --strip
+  LINUX_INCLUDE: --include-regex '(^libvips-cpp\.so|sharp\.node$)'
+  WINDOWS_INCLUDE: --include-regex '(\.dll$|sharp\.node$)'
+  MACOS_INCLUDE: --include-regex '(\.dylib$|sharp\.node$)'
 
 jobs:
   prebuild-linux-amd64:
@@ -17,7 +20,7 @@ jobs:
         run: |
           npm install --build-from-source --unsafe-perm
           rm -rf build
-          ${{ env.ELECTRON_BUILD_CMD }} -u ${{ secrets.GH_TOKEN }}
+          ${{ env.ELECTRON_BUILD_CMD }} ${{ env.LINUX_INCLUDE }} -u ${{ secrets.GH_TOKEN }}
           ls build/Release
   prebuild-linux-arm:
     strategy:
@@ -40,5 +43,5 @@ jobs:
           npm config set cache /tmp/npm-cache --global && \
           npm install --build-from-source --unsafe-perm && \
           rm -rf build && \
-          ${{ env.ELECTRON_BUILD_CMD }} -u ${{ secrets.GH_TOKEN }} && \
+          ${{ env.ELECTRON_BUILD_CMD }} ${{ env.LINUX_INCLUDE }} -u ${{ secrets.GH_TOKEN }} && \
           ls build/Release"
