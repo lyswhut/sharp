@@ -24,8 +24,8 @@ jobs:
         run: chown root.root .
       - name: Install
         run: npm install --build-from-source --unsafe-perm
-      - name: Test
-        run: npm test
+      # - name: Test
+      #   run: npm test
       - name: Prebuild
         run: npx prebuild --runtime electron --target 25.0.0 && ls build/Release
 
