@@ -31,30 +31,31 @@ jobs:
           rm -rf build
           ${{ env.ELECTRON_BUILD_CMD }} -u ${{ secrets.GH_TOKEN }}
           ls build/Release
-  # prebuild-linux-arm:
-  #   strategy:
-  #     matrix:
-  #       arch:
-  #         - arm/v7
-  #         - arm64
-  #   name: Prebuild on Linux (${{ matrix.arch }})
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: docker/setup-qemu-action@v1
-  #       with:
-  #         image: tonistiigi/binfmt:latest
-  #         platforms: arm,arm64
-  #     - run: |
-  #         docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} centos:7 -c "\
-  #         cd /tmp/project && \
-  #         npm config set cache /tmp/npm-cache --global && \
-  #         yum install -y https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm && \
-  #         yum install -y https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
-  #         yum install -y centos-release-scl && \
-  #         yum install -y devtoolset-11-gcc-c++ make git python3 nodejs fontconfig google-noto-sans-fonts && \
-  #         echo "/opt/rh/devtoolset-11/root/usr/bin" >> $GITHUB_PATH && \
-  #         npm install --ignore-scripts && \
-  #         ${{ env.ELECTRON_BUILD_CMD }} -u ${{ secrets.GH_TOKEN }} && \
-  #         ${{ env.ELECTRON_BUILD_CMD_2 }} && \
-  #         ls build/Release"
+  prebuild-linux-arm:
+    strategy:
+      matrix:
+        arch:
+          - arm/v7
+          - arm64
+    name: Prebuild on Linux (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: arm,arm64
+      - run: |
+          docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} centos:7 -c "\
+          cd /tmp/project && \
+          npm config set cache /tmp/npm-cache --global && \
+          yum install -y https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm && \
+          yum install -y https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
+          yum install -y centos-release-scl && \
+          yum install -y devtoolset-11-gcc-c++ make git python3 nodejs fontconfig google-noto-sans-fonts && \
+          chown root.root . && \
+          PATH=$PATH:/opt/rh/devtoolset-11/root/usr/bin && \
+          npm install --build-from-source --unsafe-perm && \
+          rm -rf build && \
+          ${{ env.ELECTRON_BUILD_CMD }} -u ${{ secrets.GH_TOKEN }} && \
+          ls build/Release"
