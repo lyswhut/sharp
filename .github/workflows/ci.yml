@@ -1,14 +1,14 @@
 name: CI (GitHub)
 on:
   - push
-  - pull_request
-permissions: {}
+
+env:
+  ELECTRON_BUILD_CMD: node install/libvips && npx prebuild -r electron -t 25.0.0 --strip --include-regex 'sharp\.node$'
+
 jobs:
-  CI:
-    permissions:
-      contents: write # for npx prebuild to make release
+  prebuild-linux-amd64:
     name: centos:7 - Node.js 16
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container: centos:7
     steps:
       - name: Dependencies (Linux glibc)
@@ -27,5 +27,34 @@ jobs:
       # - name: Test
       #   run: npm test
       - name: Prebuild
-        run: npx prebuild --runtime electron --target 25.0.0 --include-regex 'sharp\.node$' && ls build/Release
-
+        run: |
+          rm -rf build
+          ${{ env.ELECTRON_BUILD_CMD }} -u ${{ secrets.GH_TOKEN }}
+          ls build/Release
+  # prebuild-linux-arm:
+  #   strategy:
+  #     matrix:
+  #       arch:
+  #         - arm/v7
+  #         - arm64
+  #   name: Prebuild on Linux (${{ matrix.arch }})
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: docker/setup-qemu-action@v1
+  #       with:
+  #         image: tonistiigi/binfmt:latest
+  #         platforms: arm,arm64
+  #     - run: |
+  #         docker run --rm -v $(pwd):/tmp/project --entrypoint /bin/sh --platform linux/${{ matrix.arch }} centos:7 -c "\
+  #         cd /tmp/project && \
+  #         npm config set cache /tmp/npm-cache --global && \
+  #         yum install -y https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm && \
+  #         yum install -y https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
+  #         yum install -y centos-release-scl && \
+  #         yum install -y devtoolset-11-gcc-c++ make git python3 nodejs fontconfig google-noto-sans-fonts && \
+  #         echo "/opt/rh/devtoolset-11/root/usr/bin" >> $GITHUB_PATH && \
+  #         npm install --ignore-scripts && \
+  #         ${{ env.ELECTRON_BUILD_CMD }} -u ${{ secrets.GH_TOKEN }} && \
+  #         ${{ env.ELECTRON_BUILD_CMD_2 }} && \
+  #         ls build/Release"
